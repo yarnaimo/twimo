@@ -1,6 +1,6 @@
 {
   "name": "@yarnaimo/twimo",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "main": "src/index.ts",
   "repository": "git@github.com:yarnaimo/twimo.git",
   "author": "yamaimo <yarnaimo@gmail.com>",
