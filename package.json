@@ -1,0 +1,51 @@
+{
+  "name": "@yarnaimo/twimo",
+  "version": "0.0.0",
+  "main": "src/index.ts",
+  "repository": "git@github.com:yarnaimo/twimo.git",
+  "author": "yamaimo <yarnaimo@gmail.com>",
+  "license": "MIT",
+  "scripts": {
+    "test": "NODE_ENV=test jest"
+  },
+  "dependencies": {
+    "@types/node": "^10.9.2",
+    "axios": "^0.18.0",
+    "big-integer": "^1.6.34",
+    "config": "^2.0.1",
+    "js-yaml": "^3.12.0",
+    "lazy.js": "^0.5.1",
+    "oauth-authorization-header": "^0.0.7",
+    "ts-twitter": "^0.1.7"
+  },
+  "devDependencies": {
+    "@types/config": "^0.0.34",
+    "@types/jest": "^23.3.1",
+    "@types/js-yaml": "^3.11.2",
+    "@types/lazy.js": "^0.3.30",
+    "jest": "^23.5.0",
+    "ts-jest": "^23.1.4"
+  },
+  "jest": {
+    "transform": {
+      "^.+\\.tsx?$": "ts-jest"
+    },
+    "testEnvironment": "node",
+    "testRegex": "(/__tests__/.*|(\\.|/)(test|spec))\\.(jsx?|tsx?)$",
+    "testPathIgnorePatterns": [
+      "/dist/"
+    ],
+    "collectCoverage": true,
+    "collectCoverageFrom": [
+      "src/**/*.ts?(x)"
+    ],
+    "moduleFileExtensions": [
+      "ts",
+      "tsx",
+      "js",
+      "jsx",
+      "json",
+      "node"
+    ]
+  }
+}
