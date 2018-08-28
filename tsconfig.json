@@ -5,7 +5,8 @@
     "module": "commonjs",
     "lib": [
       "es2018"
-    ],
+		],
+		"declaration": true,
     "skipLibCheck": true,
     "sourceMap": true,
     "outDir": "dist",
@@ -17,6 +18,7 @@
     "src/**/*"
   ],
   "exclude": [
-    "node_modules"
+		"node_modules",
+		"**/*.test.ts"
   ]
 }
