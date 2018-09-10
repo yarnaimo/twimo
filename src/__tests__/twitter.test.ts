@@ -1,9 +1,9 @@
 import config from 'config'
-import { Twitter } from '..'
 import { ITweet } from '../Tweet'
+import { TwimoClient } from '../TwimoClient'
 
 const twitterConfig = config.get<any>('twitter')
-const twitter = new Twitter(twitterConfig)
+const twitter = new TwimoClient(twitterConfig)
 
 describe('Twitter', () => {
     test('get 3 tweets from home timeline', async () => {
@@ -14,7 +14,7 @@ describe('Twitter', () => {
         expect(tweets.length).toBe(3)
     })
 
-    test('post DM to myself and delete it', async () => {
+    test.only('post DM to myself and delete it', async () => {
         const text = 'soko pick up ' + new Date().toISOString()
 
         const posted = await twitter.post<any>('direct_messages/new', {

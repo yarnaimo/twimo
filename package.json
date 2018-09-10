@@ -1,42 +1,16 @@
 {
   "name": "@yarnaimo/twimo",
   "version": "1.0.3",
-  "main": "dist/index.js",
   "repository": "git@github.com:yarnaimo/twimo.git",
-  "author": "yamaimo <yarnaimo@gmail.com>",
   "license": "MIT",
+  "author": "yamaimo <yarnaimo@gmail.com>",
+  "main": "dist/index.js",
   "scripts": {
-    "test": "NODE_ENV=test jest",
     "build": "tsc",
-    "prepublish": "yarn run build"
-  },
-  "dependencies": {
-    "axios": "^0.18.0",
-    "big-integer": "^1.6.34",
-    "config": "^2.0.1",
-    "js-yaml": "^3.12.0",
-    "lazy.js": "^0.5.1",
-    "oauth-authorization-header": "^0.0.7",
-    "ts-twitter": "^0.1.7"
-  },
-  "devDependencies": {
-    "@types/config": "^0.0.34",
-    "@types/jest": "^23.3.1",
-    "@types/js-yaml": "^3.11.2",
-    "@types/lazy.js": "^0.3.30",
-    "@types/node": "^10.9.2",
-    "jest": "^23.5.0",
-    "ts-jest": "^23.1.4"
+    "prepublish": "yarn run build",
+    "test": "NODE_ENV=test jest"
   },
   "jest": {
-    "transform": {
-      "^.+\\.tsx?$": "ts-jest"
-    },
-    "testEnvironment": "node",
-    "testRegex": "(/__tests__/.*|(\\.|/)(test|spec))\\.(jsx?|tsx?)$",
-    "testPathIgnorePatterns": [
-      "/dist/"
-    ],
     "collectCoverage": true,
     "collectCoverageFrom": [
       "src/**/*.ts?(x)"
@@ -48,6 +22,31 @@
       "jsx",
       "json",
       "node"
-    ]
+    ],
+    "testEnvironment": "node",
+    "testPathIgnorePatterns": [
+      "/dist/"
+    ],
+    "testRegex": "(/__tests__/.*|(\\.|/)(test|spec))\\.(jsx?|tsx?)$",
+    "transform": {
+      "^.+\\.tsx?$": "ts-jest"
+    }
+  },
+  "dependencies": {
+    "big-integer": "^1.6.34",
+    "got": "^9.2.1",
+    "oauth-1.0a": "^2.2.4",
+    "ts-twitter": "^0.1.7"
+  },
+  "devDependencies": {
+    "@types/config": "^0.0.34",
+    "@types/got": "^8.3.3",
+    "@types/jest": "^23.3.1",
+    "@types/js-yaml": "^3.11.2",
+    "@types/node": "^10.9.2",
+    "config": "^2.0.1",
+    "jest": "^23.5.0",
+    "js-yaml": "^3.12.0",
+    "ts-jest": "^23.1.4"
   }
 }
