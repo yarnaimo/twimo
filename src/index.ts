@@ -1,4 +1,4 @@
 import { ITweet } from './Tweet'
-import { TwimoClient } from './TwimoClient'
+import { minusOne, plusOne, TwimoClient } from './TwimoClient'
 
-export { ITweet, TwimoClient }
+export { ITweet, TwimoClient, minusOne, plusOne }
