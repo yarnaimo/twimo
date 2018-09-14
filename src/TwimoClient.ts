@@ -1,8 +1,8 @@
-import bigInt from 'big-integer'
-import crypto from 'crypto'
-import got from 'got'
-import OAuth, { Token } from 'oauth-1.0a'
-import { ITweet } from './Tweet'
+import bigInt from 'big-integer';
+import crypto from 'crypto';
+import got from 'got';
+import OAuth, { Token } from 'oauth-1.0a';
+import { ITweet } from './Tweet';
 
 const baseUrl = 'https://api.twitter.com/1.1'
 
@@ -79,7 +79,6 @@ export class TwimoClient {
     async post<T>(path: string, data: ParamObject = {}) {
         const url = `${baseUrl}/${path}.json`
         const reqData = toRequestData(data)
-        console.log(reqData)
 
         const headers = this.toHeader(url, 'POST', reqData)
         const { body } = await got.post(url, {
@@ -94,9 +93,10 @@ export class TwimoClient {
     async postThread(texts: string[]) {
         return await texts.reduce(async (prevPromise, text) => {
             const prevTweets = await prevPromise
+            const lastTweet = prevTweets[prevTweets.length - 1]
 
             const t = await this.post<ITweet>('statuses/update', {
-                in_reply_to_status_id: prevTweets[prevTweets.length - 1].id_str,
+                in_reply_to_status_id: lastTweet ? lastTweet.id_str : null,
                 status: text,
             })
             return [...prevTweets, t]
