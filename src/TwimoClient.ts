@@ -1,10 +1,11 @@
-import bigInt from 'big-integer';
-import crypto from 'crypto';
-import got from 'got';
-import OAuth, { Token } from 'oauth-1.0a';
-import { ITweet } from './Tweet';
+import bigInt from 'big-integer'
+import crypto from 'crypto'
+import got from 'got'
+import OAuth, { Token } from 'oauth-1.0a'
+import { ITweet } from './Tweet'
 
-const baseUrl = 'https://api.twitter.com/1.1'
+export const baseUrl = 'https://api.twitter.com/1.1'
+export const pathToUrl = (path: string) => `${baseUrl}/${path}.json`
 
 export const plusOne = (numString: string) =>
     bigInt(numString)
@@ -56,7 +57,7 @@ export class TwimoClient {
         this.token = { key: options.token, secret: options.tokenSecret }
     }
 
-    toHeader(url: string, method: string, data: any) {
+    private toHeader(url: string, method: string, data: any) {
         const { Authorization } = this.oauth.toHeader(
             this.oauth.authorize({ url, method, data }, this.token)
         )
@@ -64,7 +65,7 @@ export class TwimoClient {
     }
 
     async get<T>(path: string, params: ParamObject = {}) {
-        const url = `${baseUrl}/${path}.json`
+        const url = pathToUrl(path)
         const reqData = toRequestData(params)
 
         const headers = this.toHeader(url, 'GET', reqData)
@@ -77,7 +78,7 @@ export class TwimoClient {
     }
 
     async post<T>(path: string, data: ParamObject = {}) {
-        const url = `${baseUrl}/${path}.json`
+        const url = pathToUrl(path)
         const reqData = toRequestData(data)
 
         const headers = this.toHeader(url, 'POST', reqData)
