@@ -94,9 +94,10 @@ export class TwimoClient {
     async postThread(texts: string[]) {
         return await texts.reduce(async (prevPromise, text) => {
             const prevTweets = await prevPromise
+            const lastTweet = prevTweets[prevTweets.length - 1]
 
             const t = await this.post<ITweet>('statuses/update', {
-                in_reply_to_status_id: prevTweets[prevTweets.length - 1].id_str,
+                in_reply_to_status_id: lastTweet ? lastTweet.id_str : null,
                 status: text,
             })
             return [...prevTweets, t]
