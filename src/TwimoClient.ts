@@ -1,21 +1,10 @@
-import bigInt from 'big-integer'
 import crypto from 'crypto'
 import got from 'got'
 import OAuth, { Token } from 'oauth-1.0a'
-import { ITweet } from './Tweet'
+import { Status } from 'twitter-d'
 
 export const baseUrl = 'https://api.twitter.com/1.1'
 export const pathToUrl = (path: string) => `${baseUrl}/${path}.json`
-
-export const plusOne = (numString: string) =>
-    bigInt(numString)
-        .plus(1)
-        .toString()
-
-export const minusOne = (numString: string) =>
-    bigInt(numString)
-        .minus(1)
-        .toString()
 
 type ParamObject = { [key: string]: any }
 
@@ -96,23 +85,23 @@ export class TwimoClient {
             const prevTweets = await prevPromise
             const lastTweet = prevTweets[prevTweets.length - 1]
 
-            const t = await this.post<ITweet>('statuses/update', {
+            const t = await this.post<Status>('statuses/update', {
                 in_reply_to_status_id: lastTweet ? lastTweet.id_str : null,
                 status: text,
             })
             return [...prevTweets, t]
-        }, Promise.resolve([] as ITweet[]))
+        }, Promise.resolve([] as Status[]))
     }
 
     async retweet(ids: string[]) {
         const tasks = ids.map(async id => {
-            const t = await this.post<ITweet>('statuses/retweet', {
+            const t = await this.post<Status>('statuses/retweet', {
                 id,
             }).catch(() => null)
             return t
         })
         const results = await Promise.all(tasks)
-        return results.filter(t => t !== null) as ITweet[]
+        return results.filter(t => t !== null) as Status[]
     }
 
     async searchTweets({
@@ -126,7 +115,7 @@ export class TwimoClient {
         maxId?: string
         sinceId?: string
     }) {
-        const { statuses } = await this.get<{ statuses: ITweet[] }>(
+        const { statuses } = await this.get<{ statuses: Status[] }>(
             'search/tweets',
             {
                 q,
@@ -136,6 +125,6 @@ export class TwimoClient {
                 since_id: sinceId,
             }
         )
-        return statuses as ITweet[]
+        return statuses
     }
 }
