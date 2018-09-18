@@ -9,7 +9,6 @@ import {
     TwimoClient,
     urlToTweetId,
 } from '..'
-import { ITweet } from '../Tweet'
 import { baseUrl } from '../TwimoClient'
 
 const twitterConfig = config.get<any>('twitter')
@@ -59,7 +58,7 @@ describe('TwimoClient', () => {
             .query({ tweet_mode, count: 3 })
             .reply(200, '[1,2,3]')
 
-        const tweets = await twitter.get<ITweet[]>('statuses/home_timeline', {
+        const tweets = await twitter.get<Status[]>('statuses/home_timeline', {
             count: 3,
             a: null,
         })
