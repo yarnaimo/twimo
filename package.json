@@ -35,9 +35,7 @@
   "dependencies": {
     "big-integer": "^1.6.34",
     "got": "^9.2.1",
-    "nock": "^9.6.1",
-    "oauth-1.0a": "^2.2.4",
-    "ts-twitter": "^0.1.7"
+    "oauth-1.0a": "^2.2.4"
   },
   "devDependencies": {
     "@types/config": "^0.0.34",
@@ -49,6 +47,8 @@
     "config": "^2.0.1",
     "jest": "^23.5.0",
     "js-yaml": "^3.12.0",
-    "ts-jest": "^23.1.4"
+    "nock": "^9.6.1",
+    "ts-jest": "^23.1.4",
+    "twitter-d": "^0.2.1"
   }
 }

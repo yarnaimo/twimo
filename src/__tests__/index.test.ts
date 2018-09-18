@@ -1,6 +1,14 @@
 import config from 'config'
 import nock from 'nock'
-import { minusOne, plusOne, TwimoClient } from '..'
+import { Status } from 'twitter-d'
+import {
+    minusOne,
+    originalTweet,
+    plusOne,
+    tweetToUrl,
+    TwimoClient,
+    urlToTweetId,
+} from '..'
 import { ITweet } from '../Tweet'
 import { baseUrl } from '../TwimoClient'
 
@@ -20,7 +28,32 @@ describe('BigInt', () => {
     })
 })
 
-describe('Twitter', () => {
+describe('Utils', () => {
+    test('original tweet', () => {
+        expect(
+            originalTweet({ retweeted_status: { id_str: '3' } } as Status)
+        ).toEqual({ id_str: '3' })
+    })
+
+    test('tweet to url', () => {
+        expect(
+            tweetToUrl({
+                retweeted_status: {
+                    id_str: '1234',
+                    user: { screen_name: 'yarnaimo' },
+                },
+            } as any)
+        ).toEqual('https://twitter.com/yarnaimo/status/1234')
+    })
+
+    test('url to tweet id', () => {
+        expect(urlToTweetId('https://twitter.com/yarnaimo/status/1234')).toBe(
+            '1234'
+        )
+    })
+})
+
+describe('TwimoClient', () => {
     test('get', async () => {
         n.get('/statuses/home_timeline.json')
             .query({ tweet_mode, count: 3 })
