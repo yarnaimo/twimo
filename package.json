@@ -33,6 +33,7 @@
     }
   },
   "dependencies": {
+    "@yarnaimo/arraymo": "^1.2.0",
     "big-integer": "^1.6.34",
     "got": "^9.2.1",
     "oauth-1.0a": "^2.2.4"

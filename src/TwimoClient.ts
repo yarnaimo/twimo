@@ -1,3 +1,4 @@
+import { PlainObject } from '@yarnaimo/arraymo'
 import crypto from 'crypto'
 import got from 'got'
 import OAuth, { Token } from 'oauth-1.0a'
@@ -6,10 +7,8 @@ import { Status } from 'twitter-d'
 export const baseUrl = 'https://api.twitter.com/1.1'
 export const pathToUrl = (path: string) => `${baseUrl}/${path}.json`
 
-type ParamObject = { [key: string]: any }
-
-const toRequestData = (source: ParamObject) => {
-    const target = {} as ParamObject
+const toRequestData = (source: PlainObject) => {
+    const target = {} as PlainObject
     for (const key in source) {
         if (source[key] != null) target[key] = source[key]
     }
@@ -53,7 +52,7 @@ export class TwimoClient {
         return { Authorization }
     }
 
-    async get<T>(path: string, params: ParamObject = {}) {
+    async get<T>(path: string, params: PlainObject = {}) {
         const url = pathToUrl(path)
         const reqData = toRequestData(params)
 
@@ -66,7 +65,7 @@ export class TwimoClient {
         return body as T
     }
 
-    async post<T>(path: string, data: ParamObject = {}) {
+    async post<T>(path: string, data: PlainObject = {}) {
         const url = pathToUrl(path)
         const reqData = toRequestData(data)
 
