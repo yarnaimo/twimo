@@ -65,19 +65,18 @@ describe('TwimoClient', () => {
         expect(tweets.length).toBe(3)
     })
 
-    test('post', async () => {
+    test('create tweet', async () => {
         const text = 'test'
 
         n.post('/statuses/update.json', {
             tweet_mode,
-            text,
-        }).reply(200, { text })
+            status: text,
+        }).reply(200, { full_text: text })
 
-        const posted = await twitter.post<any>('statuses/update', {
-            text,
+        const posted = await twitter.createTweet(text, {
             hoge: undefined,
         })
-        expect(posted.text).toBe(text)
+        expect(posted.full_text).toBe(text)
     })
 
     test('post thread', async () => {

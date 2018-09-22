@@ -79,6 +79,10 @@ export class TwimoClient {
         return body as T
     }
 
+    async createTweet(text: string, data: PlainObject = {}) {
+        return this.post<Status>('statuses/update', { ...data, status: text })
+    }
+
     async postThread(texts: string[]) {
         return await texts.reduce(async (prevPromise, text) => {
             const prevTweets = await prevPromise
