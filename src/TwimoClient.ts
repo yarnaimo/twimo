@@ -1,4 +1,4 @@
-import { PlainObject } from '@yarnaimo/arraymo'
+import { PlainObject } from '@yarnaimo/rain'
 import crypto from 'crypto'
 import got from 'got'
 import OAuth, { Token } from 'oauth-1.0a'
@@ -118,16 +118,13 @@ export class TwimoClient {
         maxId?: string
         sinceId?: string
     }) {
-        const { statuses } = await this.get<{ statuses: Status[] }>(
-            'search/tweets',
-            {
-                q,
-                count,
-                result_type: 'recent',
-                max_id: maxId,
-                since_id: sinceId,
-            }
-        )
+        const { statuses } = await this.get<{ statuses: Status[] }>('search/tweets', {
+            q,
+            count,
+            result_type: 'recent',
+            max_id: maxId,
+            since_id: sinceId,
+        })
         return statuses
     }
 }

@@ -1,14 +1,7 @@
 import config from 'config'
 import nock from 'nock'
 import { Status } from 'twitter-d'
-import {
-    minusOne,
-    originalTweet,
-    plusOne,
-    tweetToUrl,
-    TwimoClient,
-    urlToTweetId,
-} from '..'
+import { minusOne, originalTweet, plusOne, tweetToUrl, TwimoClient, urlToTweetId } from '..'
 import { baseUrl } from '../TwimoClient'
 
 const twitterConfig = config.get<any>('twitter')
@@ -29,9 +22,9 @@ describe('BigInt', () => {
 
 describe('Utils', () => {
     test('original tweet', () => {
-        expect(
-            originalTweet({ retweeted_status: { id_str: '3' } } as Status)
-        ).toEqual({ id_str: '3' })
+        expect(originalTweet({ retweeted_status: { id_str: '3' } } as Status)).toEqual({
+            id_str: '3',
+        })
     })
 
     test('tweet to url', () => {
@@ -46,9 +39,7 @@ describe('Utils', () => {
     })
 
     test('url to tweet id', () => {
-        expect(urlToTweetId('https://twitter.com/yarnaimo/status/1234')).toBe(
-            '1234'
-        )
+        expect(urlToTweetId('https://twitter.com/yarnaimo/status/1234')).toBe('1234')
     })
 })
 
@@ -82,7 +73,7 @@ describe('TwimoClient', () => {
     test('post thread', async () => {
         const responses = [{ id_str: '3' }, { id_str: '5' }]
 
-        n.post('/statuses/update.json', body => {
+        n.post('/statuses/update.json', (body: any) => {
             const repId = body.in_reply_to_status_id
             return [
                 body.tweet_mode === tweet_mode,

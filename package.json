@@ -20,7 +20,6 @@
     }
   },
   "dependencies": {
-    "@yarnaimo/arraymo": "^1.2.0",
     "@yarnaimo/rain": "^0.1.2",
     "big-integer": "^1.6.34",
     "got": "^9.2.1",
@@ -30,16 +29,12 @@
   "devDependencies": {
     "@types/config": "^0.0.34",
     "@types/got": "^8.3.3",
-    "@types/jest": "^23.3.1",
     "@types/js-yaml": "^3.11.2",
     "@types/nock": "^9.3.0",
-    "@types/node": "^10.9.2",
     "@yarnaimo/tss": "^0.0.2",
     "config": "^2.0.1",
-    "jest": "^23.5.0",
     "js-yaml": "^3.12.0",
-    "nock": "^9.6.1",
-    "ts-jest": "^23.1.4"
+    "nock": "^9.6.1"
   },
   "lint-staged": {
     "./package.json": [
