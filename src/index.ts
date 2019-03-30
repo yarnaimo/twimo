@@ -26,3 +26,17 @@ export const urlToTweetId = (url: string) => {
     const m = url.match(/(?:twitter.com\/\w+\/status\/)?(\d+)$/)
     return m ? m[1] : null
 }
+
+export const twimgUrlToOrig = (url: string) => {
+    const m1 = url.match(/^https:\/\/pbs.twimg.com\/media\/[\w-]+\.[a-z]+/m)
+    if (m1) {
+        return m1[0] + ':orig'
+    }
+
+    const m2 = url.match(/^https:\/\/pbs.twimg.com\/media\/[\w-]+\?format=\w+/m)
+    if (m2) {
+        return m2[0] + '&name=orig'
+    }
+
+    return url
+}

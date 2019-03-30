@@ -1,7 +1,15 @@
 import config from 'config'
 import nock from 'nock'
 import { Status } from 'twitter-d'
-import { minusOne, originalTweet, plusOne, tweetToUrl, TwimoClient, urlToTweetId } from '..'
+import {
+    minusOne,
+    originalTweet,
+    plusOne,
+    tweetToUrl,
+    twimgUrlToOrig,
+    TwimoClient,
+    urlToTweetId,
+} from '..'
 import { baseUrl } from '../TwimoClient'
 
 const twitterConfig = config.get<any>('twitter')
@@ -34,12 +42,21 @@ describe('Utils', () => {
                     id_str: '1234',
                     user: { screen_name: 'yarnaimo' },
                 },
-            } as any)
+            } as any),
         ).toEqual('https://twitter.com/yarnaimo/status/1234')
     })
 
     test('url to tweet id', () => {
         expect(urlToTweetId('https://twitter.com/yarnaimo/status/1234')).toBe('1234')
+    })
+
+    test('twimg url to orig', () => {
+        expect(twimgUrlToOrig('https://pbs.twimg.com/media/a-Bc.jpg?xxx')).toBe(
+            'https://pbs.twimg.com/media/a-Bc.jpg:orig',
+        )
+        expect(twimgUrlToOrig('https://pbs.twimg.com/media/a-Bc?format=png&xxx')).toBe(
+            'https://pbs.twimg.com/media/a-Bc?format=png&name=orig',
+        )
     })
 })
 
@@ -119,5 +136,49 @@ describe('TwimoClient', () => {
         const res = await twitter.searchTweets({ q, count: 2, maxId })
 
         expect(res).toEqual(response)
+    })
+
+    function v(type: string, variants: any) {
+        return {
+            extended_entities: {
+                media: [
+                    {
+                        type,
+                        video_info: {
+                            variants,
+                        },
+                    },
+                ],
+            },
+        }
+    }
+
+    test('getVideoURLInTweet - gif', async () => {
+        const id = '7'
+
+        n.get('/statuses/show.json')
+            .query({ tweet_mode, id })
+            .reply(200, v('animated_gif', [{ bitrate: 0, url: 'url_0' }]))
+
+        const res = await twitter.getVideoURLInTweet(id)
+        expect(res).toEqual({ type: 'gif', url: 'url_0' })
+    })
+
+    test('getVideoURLInTweet - video', async () => {
+        const id = '7'
+
+        n.get('/statuses/show.json')
+            .query({ tweet_mode, id })
+            .reply(
+                200,
+                v('video', [
+                    { bitrate: 0, url: 'url_0' },
+                    { bitrate: 512, url: 'url_512' },
+                    { bitrate: 256, url: 'url_256' },
+                ]),
+            )
+
+        const res = await twitter.getVideoURLInTweet(id)
+        expect(res).toEqual({ type: 'video', url: 'url_512' })
     })
 })

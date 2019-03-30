@@ -1,4 +1,4 @@
-import { PlainObject } from '@yarnaimo/rain'
+import { is, PlainObject } from '@yarnaimo/rain'
 import crypto from 'crypto'
 import got from 'got'
 import OAuth, { Token } from 'oauth-1.0a'
@@ -47,7 +47,7 @@ export class TwimoClient {
 
     private toHeader(url: string, method: string, data: any) {
         const { Authorization } = this.oauth.toHeader(
-            this.oauth.authorize({ url, method, data }, this.token)
+            this.oauth.authorize({ url, method, data }, this.token),
         )
         return { Authorization }
     }
@@ -126,5 +126,41 @@ export class TwimoClient {
             since_id: sinceId,
         })
         return statuses
+    }
+
+    async getVideoURLInTweet(id: string) {
+        const types = new Map([['video', 'video'], ['animated_gif', 'gif']])
+
+        const { extended_entities } = await this.get<Status>('statuses/show', { id })
+
+        if (
+            !extended_entities ||
+            !extended_entities.media ||
+            !extended_entities.media[0] ||
+            !extended_entities.media[0].video_info ||
+            !extended_entities.media[0].video_info.variants
+        ) {
+            return
+        }
+
+        const {
+            type,
+            video_info: { variants },
+        } = extended_entities.media[0]
+
+        const largest = variants.sort((a, b) => {
+            return (b.bitrate || 0) - (a.bitrate || 0)
+        })[0]
+
+        const mediaType = types.get(type)
+
+        if (!mediaType || !is.string(largest.url)) {
+            return
+        }
+
+        return {
+            type: mediaType,
+            url: largest.url,
+        }
     }
 }
