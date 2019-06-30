@@ -1,19 +1,18 @@
-import config from 'config'
-import nock from 'nock'
+import * as config from 'config'
+import * as nock from 'nock'
 import { Status } from 'twitter-d'
+import { baseUrl, TwimoClient } from '../TwimoClient'
 import {
+    extractTweetIdFromUrl,
+    getOrigUrlFromTwimgUrl,
+    getUrlOfTweet,
     minusOne,
     originalTweet,
     plusOne,
-    tweetToUrl,
-    twimgUrlToOrig,
-    TwimoClient,
-    urlToTweetId,
-} from '..'
-import { baseUrl } from '../TwimoClient'
+} from '../utils'
 
 const twitterConfig = config.get<any>('twitter')
-const twitter = new TwimoClient(twitterConfig)
+const twitter = TwimoClient(twitterConfig)
 const n = nock(baseUrl)
 
 const tweet_mode = 'extended'
@@ -30,14 +29,16 @@ describe('BigInt', () => {
 
 describe('Utils', () => {
     test('original tweet', () => {
-        expect(originalTweet({ retweeted_status: { id_str: '3' } } as Status)).toEqual({
+        expect(
+            originalTweet({ retweeted_status: { id_str: '3' } } as Status),
+        ).toEqual({
             id_str: '3',
         })
     })
 
     test('tweet to url', () => {
         expect(
-            tweetToUrl({
+            getUrlOfTweet({
                 retweeted_status: {
                     id_str: '1234',
                     user: { screen_name: 'yarnaimo' },
@@ -47,16 +48,20 @@ describe('Utils', () => {
     })
 
     test('url to tweet id', () => {
-        expect(urlToTweetId('https://twitter.com/yarnaimo/status/1234')).toBe('1234')
+        expect(
+            extractTweetIdFromUrl('https://twitter.com/yarnaimo/status/1234'),
+        ).toBe('1234')
     })
 
     test('twimg url to orig', () => {
-        expect(twimgUrlToOrig('https://pbs.twimg.com/media/a-Bc.jpg?xxx')).toBe(
-            'https://pbs.twimg.com/media/a-Bc.jpg:orig',
-        )
-        expect(twimgUrlToOrig('https://pbs.twimg.com/media/a-Bc?format=png&xxx')).toBe(
-            'https://pbs.twimg.com/media/a-Bc?format=png&name=orig',
-        )
+        expect(
+            getOrigUrlFromTwimgUrl('https://pbs.twimg.com/media/a-Bc.jpg?xxx'),
+        ).toBe('https://pbs.twimg.com/media/a-Bc.jpg:orig')
+        expect(
+            getOrigUrlFromTwimgUrl(
+                'https://pbs.twimg.com/media/a-Bc?format=png&xxx',
+            ),
+        ).toBe('https://pbs.twimg.com/media/a-Bc?format=png&name=orig')
     })
 })
 
@@ -160,7 +165,7 @@ describe('TwimoClient', () => {
             .query({ tweet_mode, id })
             .reply(200, v('animated_gif', [{ bitrate: 0, url: 'url_0' }]))
 
-        const res = await twitter.getVideoURLInTweet(id)
+        const res = await twitter.getVideoUrlOfTweet(id)
         expect(res).toEqual({ type: 'gif', url: 'url_0' })
     })
 
@@ -178,7 +183,7 @@ describe('TwimoClient', () => {
                 ]),
             )
 
-        const res = await twitter.getVideoURLInTweet(id)
+        const res = await twitter.getVideoUrlOfTweet(id)
         expect(res).toEqual({ type: 'video', url: 'url_512' })
     })
 })

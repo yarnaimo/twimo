@@ -1,62 +1,61 @@
-import { is, PlainObject } from '@yarnaimo/rain'
-import crypto from 'crypto'
-import got from 'got'
-import OAuth, { Token } from 'oauth-1.0a'
+import { got, Rarray } from '@yarnaimo/rain'
+import { createHmac } from 'crypto'
+import * as OAuth from 'oauth-1.0a'
 import { Status } from 'twitter-d'
+import { JsonObject, JsonValue } from 'type-fest'
+import { extractVideoUrlFromTweet } from './utils'
+
+type JsonObjectU = { [key: string]: JsonValue | undefined }
 
 export const baseUrl = 'https://api.twitter.com/1.1'
 export const pathToUrl = (path: string) => `${baseUrl}/${path}.json`
 
-const toRequestData = (source: PlainObject) => {
-    const target = {} as PlainObject
-    for (const key in source) {
-        if (source[key] != null) target[key] = source[key]
-    }
-    target.tweet_mode = 'extended'
-    return target
+const buildRequestData = (data: JsonObjectU) => {
+    const filtered = Object.entries(data).reduce(
+        (a, [key, value]) => {
+            return value != null ? { ...a, [key]: value } : a
+        },
+        {} as JsonObject,
+    )
+
+    return { ...filtered, tweet_mode: 'extended' }
 }
 
-interface OAuthOptions {
+type OAuthOptions = {
     consumerKey: string
     consumerSecret: string
     token: string
     tokenSecret: string
 }
 
-export class TwimoClient {
-    public oauth: OAuth
-    public token: Token
+export const TwimoClient = (options: OAuthOptions) => {
+    const oauth = new OAuth({
+        consumer: {
+            key: options.consumerKey,
+            secret: options.consumerSecret,
+        },
+        signature_method: 'HMAC-SHA1',
+        realm: '',
+        hash_function: (baseString, key) =>
+            createHmac('sha1', key)
+                .update(baseString)
+                .digest('base64'),
+    })
 
-    constructor(options: OAuthOptions) {
-        this.oauth = new OAuth({
-            consumer: {
-                key: options.consumerKey,
-                secret: options.consumerSecret,
-            },
-            signature_method: 'HMAC-SHA1',
-            realm: '',
-            hash_function: (baseString, key) =>
-                crypto
-                    .createHmac('sha1', key)
-                    .update(baseString)
-                    .digest('base64'),
-        })
+    const token = { key: options.token, secret: options.tokenSecret }
 
-        this.token = { key: options.token, secret: options.tokenSecret }
-    }
-
-    private toHeader(url: string, method: string, data: any) {
-        const { Authorization } = this.oauth.toHeader(
-            this.oauth.authorize({ url, method, data }, this.token),
+    const buildHeader = (url: string, method: string, data: any) => {
+        const { Authorization } = oauth.toHeader(
+            oauth.authorize({ url, method, data }, token),
         )
         return { Authorization }
     }
 
-    async get<T>(path: string, params: PlainObject = {}) {
+    const get = async <T>(path: string, params: JsonObjectU = {}) => {
         const url = pathToUrl(path)
-        const reqData = toRequestData(params)
+        const reqData = buildRequestData(params)
 
-        const headers = this.toHeader(url, 'GET', reqData)
+        const headers = buildHeader(url, 'GET', reqData)
         const { body } = await got.get(url, {
             headers,
             json: true,
@@ -65,11 +64,11 @@ export class TwimoClient {
         return body as T
     }
 
-    async post<T>(path: string, data: PlainObject = {}) {
+    const post = async <T>(path: string, data: JsonObjectU = {}) => {
         const url = pathToUrl(path)
-        const reqData = toRequestData(data)
+        const reqData = buildRequestData(data)
 
-        const headers = this.toHeader(url, 'POST', reqData)
+        const headers = buildHeader(url, 'POST', reqData)
         const { body } = await got.post(url, {
             headers,
             json: true,
@@ -79,35 +78,34 @@ export class TwimoClient {
         return body as T
     }
 
-    async createTweet(text: string, data: PlainObject = {}) {
-        return this.post<Status>('statuses/update', { ...data, status: text })
+    const createTweet = async (text: string, data: JsonObjectU = {}) => {
+        return post<Status>('statuses/update', { ...data, status: text })
     }
 
-    async postThread(texts: string[]) {
-        return await texts.reduce(async (prevPromise, text) => {
-            const prevTweets = await prevPromise
-            const lastTweet = prevTweets[prevTweets.length - 1]
+    const postThread = async (texts: string[]) => {
+        const postedTweets = [] as Status[]
 
-            const t = await this.post<Status>('statuses/update', {
+        for (const text of texts) {
+            const lastTweet = postedTweets[postedTweets.length - 1]
+
+            const tweet = await post<Status>('statuses/update', {
                 in_reply_to_status_id: lastTweet ? lastTweet.id_str : null,
                 status: text,
             })
-            return [...prevTweets, t]
-        }, Promise.resolve([] as Status[]))
+            postedTweets.push(tweet)
+        }
+
+        return postedTweets
     }
 
-    async retweet(ids: string[]) {
-        const tasks = ids.map(async id => {
-            const t = await this.post<Status>('statuses/retweet', {
-                id,
-            }).catch(() => null)
-            return t
-        })
-        const results = await Promise.all(tasks)
-        return results.filter(t => t !== null) as Status[]
+    const retweet = async (ids: string[]) => {
+        const tweets = await Rarray.onlyResolved(ids, async id =>
+            post<Status>('statuses/retweet', { id }),
+        )
+        return tweets
     }
 
-    async searchTweets({
+    const searchTweets = async ({
         q,
         count = 100,
         maxId,
@@ -117,50 +115,35 @@ export class TwimoClient {
         count?: number
         maxId?: string
         sinceId?: string
-    }) {
-        const { statuses } = await this.get<{ statuses: Status[] }>('search/tweets', {
-            q,
-            count,
-            result_type: 'recent',
-            max_id: maxId,
-            since_id: sinceId,
-        })
+    }) => {
+        const { statuses } = await get<{ statuses: Status[] }>(
+            'search/tweets',
+            {
+                q,
+                count,
+                result_type: 'recent',
+                max_id: maxId,
+                since_id: sinceId,
+            },
+        )
         return statuses
     }
 
-    async getVideoURLInTweet(id: string) {
-        const types = new Map([['video', 'video'], ['animated_gif', 'gif']])
+    const getVideoUrlOfTweet = async (id: string) => {
+        const tweet = await get<Status>('statuses/show', {
+            id,
+        })
+        const url = extractVideoUrlFromTweet(tweet)
+        return url
+    }
 
-        const { extended_entities } = await this.get<Status>('statuses/show', { id })
-
-        if (
-            !extended_entities ||
-            !extended_entities.media ||
-            !extended_entities.media[0] ||
-            !extended_entities.media[0].video_info ||
-            !extended_entities.media[0].video_info.variants
-        ) {
-            return
-        }
-
-        const {
-            type,
-            video_info: { variants },
-        } = extended_entities.media[0]
-
-        const largest = variants.sort((a, b) => {
-            return (b.bitrate || 0) - (a.bitrate || 0)
-        })[0]
-
-        const mediaType = types.get(type)
-
-        if (!mediaType || !is.string(largest.url)) {
-            return
-        }
-
-        return {
-            type: mediaType,
-            url: largest.url,
-        }
+    return {
+        get,
+        post,
+        createTweet,
+        postThread,
+        retweet,
+        searchTweets,
+        getVideoUrlOfTweet,
     }
 }
