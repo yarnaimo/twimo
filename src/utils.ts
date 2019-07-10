@@ -1,6 +1,6 @@
 import { is } from '@yarnaimo/rain'
 import * as bigInt from 'big-integer'
-import { ExtendedEntities, Status } from 'twitter-d'
+import { ExtendedEntities, MediaEntity, Status } from 'twitter-d'
 
 export const plusOne = (numString: string) =>
     bigInt(numString)
@@ -47,30 +47,32 @@ const getMediaList = (
     return extended_entities && extended_entities.media
 }
 
-export const extractImageUrlsFromTweet = ({ extended_entities }: Status) => {
-    const mediaList = getMediaList(extended_entities)
-    if (!mediaList) {
-        return
-    }
-
-    const images = mediaList.filter(media => media.type === 'photo')
+export const extractImageEntitiesFromMediaEntities = (
+    mediaEntities: MediaEntity[],
+) => {
+    const images = mediaEntities.filter(entity => entity.type === 'photo')
     if (!images.length) {
         return
     }
 
-    return images.map(image => getOrigUrlFromTwimgUrl(image.media_url_https))
+    return images.map(image => ({
+        type: 'image' as const,
+        url: getOrigUrlFromTwimgUrl(image.media_url_https),
+    }))
 }
 
-export const extractVideoUrlFromTweet = ({ extended_entities }: Status) => {
-    const types = new Map([['video', 'video'], ['animated_gif', 'gif']])
-
-    const mediaList = getMediaList(extended_entities)
+export const extractVideoEntityFromMediaEntities = (
+    mediaEntities: MediaEntity[],
+) => {
+    const types = new Map([
+        ['video', 'video' as const],
+        ['animated_gif', 'gif' as const],
+    ])
 
     if (
-        !mediaList ||
-        !mediaList[0] ||
-        !mediaList[0].video_info ||
-        !mediaList[0].video_info.variants
+        !mediaEntities[0] ||
+        !mediaEntities[0].video_info ||
+        !mediaEntities[0].video_info.variants
     ) {
         return
     }
@@ -78,7 +80,7 @@ export const extractVideoUrlFromTweet = ({ extended_entities }: Status) => {
     const {
         type,
         video_info: { variants },
-    } = mediaList[0]
+    } = mediaEntities[0]
 
     const largest = variants.sort((a, b) => {
         return (b.bitrate || 0) - (a.bitrate || 0)
@@ -94,4 +96,23 @@ export const extractVideoUrlFromTweet = ({ extended_entities }: Status) => {
         type: mediaType,
         url: largest.url,
     }
+}
+
+export const extractMediaListFromTweet = ({ extended_entities }: Status) => {
+    const mediaEntities = getMediaList(extended_entities)
+    if (!mediaEntities) {
+        return
+    }
+
+    const imageEntities = extractImageEntitiesFromMediaEntities(mediaEntities)
+    if (imageEntities) {
+        return imageEntities
+    }
+
+    const videoEntity = extractVideoEntityFromMediaEntities(mediaEntities)
+    if (videoEntity) {
+        return [videoEntity]
+    }
+
+    return
 }

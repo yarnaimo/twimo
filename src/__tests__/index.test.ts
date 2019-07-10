@@ -3,9 +3,8 @@ import * as nock from 'nock'
 import { Status } from 'twitter-d'
 import { baseUrl, TwimoClient } from '../TwimoClient'
 import {
-    extractImageUrlsFromTweet,
+    extractMediaListFromTweet,
     extractTweetIdFromUrl,
-    extractVideoUrlFromTweet,
     getOrigUrlFromTwimgUrl,
     getUrlOfTweet,
     minusOne,
@@ -66,8 +65,8 @@ describe('Utils', () => {
         )
     })
 
-    test('extractImageUrlsFromTweet', () => {
-        const media = [
+    test('extractMediaListFromTweet - image', () => {
+        const entities = [
             {
                 type: 'photo',
                 media_url_https: mediaUrl + '1.jpg?xxx',
@@ -83,11 +82,16 @@ describe('Utils', () => {
         ]
 
         expect(
-            extractImageUrlsFromTweet({ extended_entities: { media } } as any),
-        ).toEqual([mediaUrl + '1.jpg:orig', mediaUrl + '2.jpg:orig'])
+            extractMediaListFromTweet({
+                extended_entities: { media: entities },
+            } as any),
+        ).toEqual([
+            { type: 'image', url: mediaUrl + '1.jpg:orig' },
+            { type: 'image', url: mediaUrl + '2.jpg:orig' },
+        ])
     })
 
-    test('extractVideoUrlFromTweet', () => {
+    test('extractMediaListFromTweet - video', () => {
         const video_info = {
             variants: [
                 { bitrate: 200, url: mediaUrl + '2.mp4' },
@@ -98,20 +102,20 @@ describe('Utils', () => {
         }
 
         expect(
-            extractVideoUrlFromTweet({
+            extractMediaListFromTweet({
                 extended_entities: {
                     media: [{ type: 'video', video_info }],
                 },
             } as any),
-        ).toEqual({ type: 'video', url: mediaUrl + '3.mp4' })
+        ).toEqual([{ type: 'video', url: mediaUrl + '3.mp4' }])
 
         expect(
-            extractVideoUrlFromTweet({
+            extractMediaListFromTweet({
                 extended_entities: {
                     media: [{ type: 'animated_gif', video_info }],
                 },
             } as any),
-        ).toEqual({ type: 'gif', url: mediaUrl + '3.mp4' })
+        ).toEqual([{ type: 'gif', url: mediaUrl + '3.mp4' }])
     })
 })
 
