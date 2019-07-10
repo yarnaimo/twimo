@@ -3,7 +3,6 @@ import { createHmac } from 'crypto'
 import * as OAuth from 'oauth-1.0a'
 import { Status } from 'twitter-d'
 import { JsonObject, JsonValue } from 'type-fest'
-import { extractVideoUrlFromTweet } from './utils'
 
 type JsonObjectU = { [key: string]: JsonValue | undefined }
 
@@ -129,14 +128,6 @@ export const TwimoClient = (options: OAuthOptions) => {
         return statuses
     }
 
-    const getVideoUrlOfTweet = async (id: string) => {
-        const tweet = await get<Status>('statuses/show', {
-            id,
-        })
-        const url = extractVideoUrlFromTweet(tweet)
-        return url
-    }
-
     return {
         get,
         post,
@@ -144,6 +135,5 @@ export const TwimoClient = (options: OAuthOptions) => {
         postThread,
         retweet,
         searchTweets,
-        getVideoUrlOfTweet,
     }
 }

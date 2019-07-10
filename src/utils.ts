@@ -1,6 +1,6 @@
 import { is } from '@yarnaimo/rain'
 import * as bigInt from 'big-integer'
-import { Status } from 'twitter-d'
+import { ExtendedEntities, Status } from 'twitter-d'
 
 export const plusOne = (numString: string) =>
     bigInt(numString)
@@ -41,15 +41,36 @@ export const getOrigUrlFromTwimgUrl = (url: string) => {
     return url
 }
 
+const getMediaList = (
+    extended_entities: ExtendedEntities | null | undefined,
+) => {
+    return extended_entities && extended_entities.media
+}
+
+export const extractImageUrlsFromTweet = ({ extended_entities }: Status) => {
+    const mediaList = getMediaList(extended_entities)
+    if (!mediaList) {
+        return
+    }
+
+    const images = mediaList.filter(media => media.type === 'photo')
+    if (!images.length) {
+        return
+    }
+
+    return images.map(image => getOrigUrlFromTwimgUrl(image.media_url_https))
+}
+
 export const extractVideoUrlFromTweet = ({ extended_entities }: Status) => {
     const types = new Map([['video', 'video'], ['animated_gif', 'gif']])
 
+    const mediaList = getMediaList(extended_entities)
+
     if (
-        !extended_entities ||
-        !extended_entities.media ||
-        !extended_entities.media[0] ||
-        !extended_entities.media[0].video_info ||
-        !extended_entities.media[0].video_info.variants
+        !mediaList ||
+        !mediaList[0] ||
+        !mediaList[0].video_info ||
+        !mediaList[0].video_info.variants
     ) {
         return
     }
@@ -57,7 +78,7 @@ export const extractVideoUrlFromTweet = ({ extended_entities }: Status) => {
     const {
         type,
         video_info: { variants },
-    } = extended_entities.media[0]
+    } = mediaList[0]
 
     const largest = variants.sort((a, b) => {
         return (b.bitrate || 0) - (a.bitrate || 0)

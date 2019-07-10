@@ -3,7 +3,9 @@ import * as nock from 'nock'
 import { Status } from 'twitter-d'
 import { baseUrl, TwimoClient } from '../TwimoClient'
 import {
+    extractImageUrlsFromTweet,
     extractTweetIdFromUrl,
+    extractVideoUrlFromTweet,
     getOrigUrlFromTwimgUrl,
     getUrlOfTweet,
     minusOne,
@@ -18,17 +20,17 @@ const n = nock(baseUrl)
 const tweet_mode = 'extended'
 
 describe('BigInt', () => {
-    test('plus one', () => {
+    test('plusOne', () => {
         expect(plusOne('17')).toBe('18')
     })
 
-    test('minus one', () => {
+    test('minusOne', () => {
         expect(minusOne('17')).toBe('16')
     })
 })
 
 describe('Utils', () => {
-    test('original tweet', () => {
+    test('originalTweet', () => {
         expect(
             originalTweet({ retweeted_status: { id_str: '3' } } as Status),
         ).toEqual({
@@ -36,7 +38,7 @@ describe('Utils', () => {
         })
     })
 
-    test('tweet to url', () => {
+    test('getUrlOfTweet', () => {
         expect(
             getUrlOfTweet({
                 retweeted_status: {
@@ -47,21 +49,69 @@ describe('Utils', () => {
         ).toEqual('https://twitter.com/yarnaimo/status/1234')
     })
 
-    test('url to tweet id', () => {
+    test('extractTweetIdFromUrl', () => {
         expect(
             extractTweetIdFromUrl('https://twitter.com/yarnaimo/status/1234'),
         ).toBe('1234')
     })
 
-    test('twimg url to orig', () => {
+    const mediaUrl = 'https://pbs.twimg.com/media/a-Bc'
+
+    test('getOrigUrlFromTwimgUrl', () => {
+        expect(getOrigUrlFromTwimgUrl(mediaUrl + '.jpg?xxx')).toBe(
+            mediaUrl + '.jpg:orig',
+        )
+        expect(getOrigUrlFromTwimgUrl(mediaUrl + '?format=png&xxx')).toBe(
+            mediaUrl + '?format=png&name=orig',
+        )
+    })
+
+    test('extractImageUrlsFromTweet', () => {
+        const media = [
+            {
+                type: 'photo',
+                media_url_https: mediaUrl + '1.jpg?xxx',
+            },
+            {
+                type: 'photo',
+                media_url_https: mediaUrl + '2.jpg?xxx',
+            },
+            {
+                type: 'video',
+                media_url_https: mediaUrl + '3.mp4?xxx',
+            },
+        ]
+
         expect(
-            getOrigUrlFromTwimgUrl('https://pbs.twimg.com/media/a-Bc.jpg?xxx'),
-        ).toBe('https://pbs.twimg.com/media/a-Bc.jpg:orig')
+            extractImageUrlsFromTweet({ extended_entities: { media } } as any),
+        ).toEqual([mediaUrl + '1.jpg:orig', mediaUrl + '2.jpg:orig'])
+    })
+
+    test('extractVideoUrlFromTweet', () => {
+        const video_info = {
+            variants: [
+                { bitrate: 200, url: mediaUrl + '2.mp4' },
+                { bitrate: 300, url: mediaUrl + '3.mp4' },
+                { url: mediaUrl + '.mp4' },
+                { bitrate: 100, url: mediaUrl + '1.mp4' },
+            ],
+        }
+
         expect(
-            getOrigUrlFromTwimgUrl(
-                'https://pbs.twimg.com/media/a-Bc?format=png&xxx',
-            ),
-        ).toBe('https://pbs.twimg.com/media/a-Bc?format=png&name=orig')
+            extractVideoUrlFromTweet({
+                extended_entities: {
+                    media: [{ type: 'video', video_info }],
+                },
+            } as any),
+        ).toEqual({ type: 'video', url: mediaUrl + '3.mp4' })
+
+        expect(
+            extractVideoUrlFromTweet({
+                extended_entities: {
+                    media: [{ type: 'animated_gif', video_info }],
+                },
+            } as any),
+        ).toEqual({ type: 'gif', url: mediaUrl + '3.mp4' })
     })
 })
 
@@ -157,33 +207,4 @@ describe('TwimoClient', () => {
             },
         }
     }
-
-    test('getVideoURLInTweet - gif', async () => {
-        const id = '7'
-
-        n.get('/statuses/show.json')
-            .query({ tweet_mode, id })
-            .reply(200, v('animated_gif', [{ bitrate: 0, url: 'url_0' }]))
-
-        const res = await twitter.getVideoUrlOfTweet(id)
-        expect(res).toEqual({ type: 'gif', url: 'url_0' })
-    })
-
-    test('getVideoURLInTweet - video', async () => {
-        const id = '7'
-
-        n.get('/statuses/show.json')
-            .query({ tweet_mode, id })
-            .reply(
-                200,
-                v('video', [
-                    { bitrate: 0, url: 'url_0' },
-                    { bitrate: 512, url: 'url_512' },
-                    { bitrate: 256, url: 'url_256' },
-                ]),
-            )
-
-        const res = await twitter.getVideoUrlOfTweet(id)
-        expect(res).toEqual({ type: 'video', url: 'url_512' })
-    })
 })
