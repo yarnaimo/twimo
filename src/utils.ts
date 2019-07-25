@@ -27,15 +27,31 @@ export const extractTweetIdFromUrl = (url: string) => {
     return m ? m[1] : null
 }
 
-export const getOrigUrlFromTwimgUrl = (url: string) => {
+type ImageSizeLabel = 'thumb' | 'small' | 'medium' | 'large' | 'orig'
+
+type _TwimoMediaType<T> = {
+    type: T
+    url: string
+    thumbUrl: string
+}
+
+export type TwimoMediaTypes = {
+    image: _TwimoMediaType<'image'>
+    video: _TwimoMediaType<'video'>
+    gif: _TwimoMediaType<'gif'>
+}
+
+export const getImageUrlWithSizeLabel = (size: ImageSizeLabel, url: string) => {
     const m1 = url.match(/^https:\/\/pbs.twimg.com\/media\/[\w-]+\.[a-z]+/m)
     if (m1) {
-        return m1[0] + ':orig'
+        return m1[0] + `:${size}`
     }
 
-    const m2 = url.match(/^https:\/\/pbs.twimg.com\/media\/[\w-]+\?format=\w+/m)
+    const m2 = url.match(
+        /^(https:\/\/pbs.twimg.com\/media\/[\w-]+\?).*(format=\w+)/m,
+    )
     if (m2) {
-        return m2[0] + '&name=orig'
+        return m2[1] + m2[2] + `&name=${size}`
     }
 
     return url
@@ -55,15 +71,16 @@ export const extractImageEntitiesFromMediaEntities = (
         return
     }
 
-    return images.map(image => ({
+    return images.map<TwimoMediaTypes['image']>(image => ({
         type: 'image' as const,
-        url: getOrigUrlFromTwimgUrl(image.media_url_https),
+        url: getImageUrlWithSizeLabel('orig', image.media_url_https),
+        thumbUrl: getImageUrlWithSizeLabel('small', image.media_url_https),
     }))
 }
 
 export const extractVideoEntityFromMediaEntities = (
     mediaEntities: MediaEntity[],
-) => {
+): TwimoMediaTypes['video' | 'gif'] | undefined => {
     const types = new Map([
         ['video', 'video' as const],
         ['animated_gif', 'gif' as const],
@@ -80,6 +97,7 @@ export const extractVideoEntityFromMediaEntities = (
     const {
         type,
         video_info: { variants },
+        media_url_https,
     } = mediaEntities[0]
 
     const largest = variants.sort((a, b) => {
@@ -95,6 +113,7 @@ export const extractVideoEntityFromMediaEntities = (
     return {
         type: mediaType,
         url: largest.url,
+        thumbUrl: getImageUrlWithSizeLabel('small', media_url_https),
     }
 }
 
@@ -111,7 +130,7 @@ export const extractMediaListFromTweet = ({ extended_entities }: Status) => {
 
     const videoEntity = extractVideoEntityFromMediaEntities(mediaEntities)
     if (videoEntity) {
-        return [videoEntity]
+        return [videoEntity] as const
     }
 
     return
