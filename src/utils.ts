@@ -117,7 +117,9 @@ export const extractVideoEntityFromMediaEntities = (
     }
 }
 
-export const extractMediaListFromTweet = ({ extended_entities }: Status) => {
+export const extractMediaListFromTweet = ({
+    extended_entities,
+}: Status): TwimoMediaTypes[keyof TwimoMediaTypes][] | undefined => {
     const mediaEntities = getMediaList(extended_entities)
     if (!mediaEntities) {
         return
@@ -130,7 +132,7 @@ export const extractMediaListFromTweet = ({ extended_entities }: Status) => {
 
     const videoEntity = extractVideoEntityFromMediaEntities(mediaEntities)
     if (videoEntity) {
-        return [videoEntity] as const
+        return [videoEntity]
     }
 
     return
