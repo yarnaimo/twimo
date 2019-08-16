@@ -50,6 +50,12 @@ export const TwimoClient = (options: OAuthOptions) => {
         return { Authorization }
     }
 
+    const defaultParams = {
+        trim_user: false,
+        exclude_replies: false,
+        include_entities: true,
+    }
+
     const get = async <T>(path: string, params: JsonObjectU = {}) => {
         const url = pathToUrl(path)
         const reqData = buildRequestData(params)
@@ -129,6 +135,7 @@ export const TwimoClient = (options: OAuthOptions) => {
     }
 
     return {
+        defaultParams,
         get,
         post,
         createTweet,
