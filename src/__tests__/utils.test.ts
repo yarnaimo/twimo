@@ -104,7 +104,8 @@ test('extractMediaListFromTweet - video', () => {
                     {
                         type: 'video',
                         video_info,
-                        media_url_https: mediaUrl + '1.jpg?xxx',
+                        media_url_https:
+                            'https://pbs.twimg.com/ext_tw_video_thumb/1/pu/img/a-Bc.jpg?xxx',
                     },
                 ],
             },
@@ -113,7 +114,8 @@ test('extractMediaListFromTweet - video', () => {
         {
             type: 'video',
             url: mediaUrl + '3.mp4',
-            thumbUrl: mediaUrl + '1.jpg:small',
+            thumbUrl:
+                'https://pbs.twimg.com/ext_tw_video_thumb/1/pu/img/a-Bc.jpg:small',
         },
     ])
 

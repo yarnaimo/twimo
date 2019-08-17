@@ -47,6 +47,13 @@ export const getImageUrlWithSizeLabel = (size: ImageSizeLabel, url: string) => {
         return m1[0] + `:${size}`
     }
 
+    const mv = url.match(
+        /^https:\/\/pbs.twimg.com\/ext_tw_video_thumb\/\d+\/pu\/img\/[\w-]+\.[a-z]+/m,
+    )
+    if (mv) {
+        return mv[0] + `:${size}`
+    }
+
     const m2 = url.match(
         /^(https:\/\/pbs.twimg.com\/media\/[\w-]+\?).*(format=\w+)/m,
     )
