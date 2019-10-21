@@ -15,7 +15,7 @@
     "ts-node": "ts-node"
   },
   "dependencies": {
-    "@yarnaimo/rain": "^0.3.0",
+    "@yarnaimo/rain": "^0.4.1",
     "big-integer": "^1.6.44",
     "oauth-1.0a": "^2.2.6",
     "twitter-d": "^0.2.1"

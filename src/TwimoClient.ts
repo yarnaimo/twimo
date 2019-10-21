@@ -1,5 +1,6 @@
-import { got, Rarray } from '@yarnaimo/rain'
+import { Rarray } from '@yarnaimo/rain'
 import { createHmac } from 'crypto'
+import got from 'got'
 import * as OAuth from 'oauth-1.0a'
 import { Status } from 'twitter-d'
 import { JsonObject, JsonValue } from 'type-fest'
@@ -56,31 +57,36 @@ export const TwimoClient = (options: OAuthOptions) => {
         include_entities: true,
     }
 
-    const get = async <T>(path: string, params: JsonObjectU = {}) => {
+    const get = async <T extends object>(
+        path: string,
+        params: JsonObjectU = {},
+    ) => {
         const url = pathToUrl(path)
         const reqData = buildRequestData(params)
 
         const headers = buildHeader(url, 'GET', reqData)
-        const { body } = await got.get(url, {
-            headers,
-            json: true,
-            query: reqData,
-        })
-        return body as T
+        return got
+            .get(url, {
+                headers,
+                searchParams: reqData,
+            })
+            .json<T>()
     }
 
-    const post = async <T>(path: string, data: JsonObjectU = {}) => {
+    const post = async <T extends object>(
+        path: string,
+        data: JsonObjectU = {},
+    ) => {
         const url = pathToUrl(path)
         const reqData = buildRequestData(data)
 
         const headers = buildHeader(url, 'POST', reqData)
-        const { body } = await got.post(url, {
-            headers,
-            json: true,
-            form: true,
-            body: reqData,
-        })
-        return body as T
+        return got
+            .post(url, {
+                headers,
+                form: reqData,
+            })
+            .json<T>()
     }
 
     const createTweet = async (text: string, data: JsonObjectU = {}) => {
@@ -104,7 +110,7 @@ export const TwimoClient = (options: OAuthOptions) => {
     }
 
     const retweet = async (ids: string[]) => {
-        const tweets = await Rarray.onlyResolved(ids, async id =>
+        const tweets = await Rarray(ids).onlyResolved(async id =>
             post<Status>('statuses/retweet', { id }),
         )
         return tweets

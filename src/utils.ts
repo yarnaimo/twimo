@@ -1,4 +1,4 @@
-import { is } from '@yarnaimo/rain'
+import is from '@sindresorhus/is'
 import * as bigInt from 'big-integer'
 import { ExtendedEntities, MediaEntity, Status } from 'twitter-d'
 
