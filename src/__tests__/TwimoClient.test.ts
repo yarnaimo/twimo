@@ -1,5 +1,5 @@
-import * as config from 'config'
-import * as nock from 'nock'
+import config from 'config'
+import nock from 'nock'
 import { Status } from 'twitter-d'
 import { baseUrl, TwimoClient } from '../TwimoClient'
 
@@ -47,7 +47,7 @@ test('post thread', async () => {
         ].every(e => e)
     })
         .twice()
-        .reply(() => responses.shift())
+        .reply(() => [200, responses.shift()])
 
     const posted = await twitter.postThread(['test1', 'test2'])
 

@@ -1,6 +1,6 @@
 import is from '@sindresorhus/is'
-import * as bigInt from 'big-integer'
-import { ExtendedEntities, MediaEntity, Status } from 'twitter-d'
+import bigInt from 'big-integer'
+import { ExtendedEntities, FullUser, MediaEntity, Status } from 'twitter-d'
 
 export const plusOne = (numString: string) =>
     bigInt(numString)
@@ -18,7 +18,7 @@ export const getUrlOfTweet = (t: Status) => {
     const {
         id_str,
         user: { screen_name },
-    } = originalTweet(t)
+    } = originalTweet(t) as Status & { user: FullUser }
     return `https://twitter.com/${screen_name}/status/${id_str}`
 }
 

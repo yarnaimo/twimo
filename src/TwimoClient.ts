@@ -1,7 +1,7 @@
 import { Rarray } from '@yarnaimo/rain'
 import { createHmac } from 'crypto'
 import got from 'got'
-import * as OAuth from 'oauth-1.0a'
+import OAuth from 'oauth-1.0a'
 import { Status } from 'twitter-d'
 import { JsonObject, JsonValue } from 'type-fest'
 
