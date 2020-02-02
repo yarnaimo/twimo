@@ -18,18 +18,23 @@ const buildRequestData = (data: JsonObjectU) => {
     return { ...filtered, tweet_mode: 'extended' }
 }
 
-export type OAuthOptions = {
+export type TwitterAPIKeyOptions = {
     consumerKey: string
     consumerSecret: string
+}
+export type TwitterTokenOptions = {
     token: string
     tokenSecret: string
 }
 
-export const Twimo = (options: OAuthOptions) => {
+export const Twimo = ({
+    consumerKey,
+    consumerSecret,
+}: TwitterAPIKeyOptions) => ({ token, tokenSecret }: TwitterTokenOptions) => {
     const oauth = new OAuth({
         consumer: {
-            key: options.consumerKey,
-            secret: options.consumerSecret,
+            key: consumerKey,
+            secret: consumerSecret,
         },
         signature_method: 'HMAC-SHA1',
         realm: '',
@@ -39,11 +44,11 @@ export const Twimo = (options: OAuthOptions) => {
                 .digest('base64'),
     })
 
-    const token = { key: options.token, secret: options.tokenSecret }
+    const tokenPair = { key: token, secret: tokenSecret }
 
     const buildHeader = (url: string, method: string, data: any) => {
         const { Authorization } = oauth.toHeader(
-            oauth.authorize({ url, method, data }, token),
+            oauth.authorize({ url, method, data }, tokenPair),
         )
         return { Authorization }
     }
@@ -51,7 +56,8 @@ export const Twimo = (options: OAuthOptions) => {
     return { buildHeader }
 }
 
-export type Twimo = ReturnType<typeof Twimo>
+export type TwimoBuilder = ReturnType<typeof Twimo>
+export type Twimo = ReturnType<TwimoBuilder>
 
 const defaultParams = {
     trim_user: false,

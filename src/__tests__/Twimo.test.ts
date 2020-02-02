@@ -4,8 +4,8 @@ import nock from 'nock'
 import { Status } from 'twitter-d'
 import { baseUrl, T, Twimo } from '../Twimo'
 
-const twitterConfig = config.get<any>('twitter')
-const twimo = Twimo(twitterConfig)
+const { apiKeyOptions, tokenOptions } = config.get<any>('twitter')
+const twimo = Twimo(apiKeyOptions)(tokenOptions)
 const n = nock(baseUrl)
 
 const tweet_mode = 'extended'
