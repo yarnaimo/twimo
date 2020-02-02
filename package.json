@@ -15,18 +15,18 @@
     "ts-node": "ts-node"
   },
   "dependencies": {
-    "@yarnaimo/rain": "^0.4.1",
-    "big-integer": "^1.6.47",
+    "@yarnaimo/rain": "^0.5.0",
+    "big-integer": "^1.6.48",
     "oauth-1.0a": "^2.2.6",
     "twitter-d": "^0.4.0"
   },
   "devDependencies": {
-    "@types/config": "^0.0.35",
-    "@types/js-yaml": "^3.12.1",
+    "@types/config": "^0.0.36",
+    "@types/js-yaml": "^3.12.2",
     "@types/nock": "^11.1.0",
-    "@yarnaimo/tss": "^0.1.13",
-    "config": "^3.2.4",
+    "@yarnaimo/tss": "^0.1.15",
+    "config": "^3.2.5",
     "js-yaml": "^3.13.1",
-    "nock": "^11.6.0"
+    "nock": "^11.7.2"
   }
 }
