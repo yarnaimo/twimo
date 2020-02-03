@@ -53,7 +53,7 @@ export const Twimo = ({
         return { Authorization }
     }
 
-    return { buildHeader }
+    return { token, tokenSecret, buildHeader }
 }
 
 export type TwimoBuilder = ReturnType<typeof Twimo>
