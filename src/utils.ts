@@ -3,14 +3,10 @@ import bigInt from 'big-integer'
 import { ExtendedEntities, FullUser, MediaEntity, Status } from 'twitter-d'
 
 export const plusOne = (numString: string) =>
-    bigInt(numString)
-        .plus(1)
-        .toString()
+    bigInt(numString).plus(1).toString()
 
 export const minusOne = (numString: string) =>
-    bigInt(numString)
-        .minus(1)
-        .toString()
+    bigInt(numString).minus(1).toString()
 
 export const originalTweet = (t: Status) => t.retweeted_status || t
 
@@ -73,12 +69,12 @@ const getMediaList = (
 export const extractImageEntitiesFromMediaEntities = (
     mediaEntities: MediaEntity[],
 ) => {
-    const images = mediaEntities.filter(entity => entity.type === 'photo')
+    const images = mediaEntities.filter((entity) => entity.type === 'photo')
     if (!images.length) {
         return
     }
 
-    return images.map<TwimoMediaTypes['image']>(image => ({
+    return images.map<TwimoMediaTypes['image']>((image) => ({
         type: 'image' as const,
         url: getImageUrlWithSizeLabel('orig', image.media_url_https),
         thumbUrl: getImageUrlWithSizeLabel('small', image.media_url_https),

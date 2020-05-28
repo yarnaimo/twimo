@@ -1,8 +1,8 @@
-import { $ } from '@yarnaimo/rain'
 import config from 'config'
 import nock from 'nock'
 import { Status } from 'twitter-d'
-import { baseUrl, T, Twimo } from '../Twimo'
+import { T } from '../api'
+import { baseUrl, Twimo } from '../Twimo'
 
 const { apiKeyOptions, tokenOptions } = config.get<any>('twitter')
 const twimo = Twimo(apiKeyOptions)(tokenOptions)
@@ -16,13 +16,10 @@ describe('get', () => {
             .query({ tweet_mode, count: 3 })
             .reply(200, '[1,2,3]')
 
-        const tweets = await $.p(
-            twimo,
-            T.get<Status[]>('statuses/home_timeline', {
-                count: 3,
-                a: null,
-            }),
-        )
+        const tweets = await T.get<Status[]>(twimo, 'statuses/home_timeline', {
+            count: 3,
+            a: null,
+        })
 
         expect(tweets.length).toBe(3)
     })
@@ -32,7 +29,7 @@ describe('get', () => {
             .query({ tweet_mode, ...T.defaultParams, id: '1,3' })
             .reply(200, '[1,3]')
 
-        const tweets = await $.p(twimo, T.lookupTweets(['1', '3']))
+        const tweets = await T.lookupTweets(twimo, ['1', '3'])
 
         expect(tweets.length).toBe(2)
     })
@@ -52,20 +49,20 @@ describe('get', () => {
             })
             .reply(200, { statuses: response })
 
-        const res = await $.p(twimo, T.searchTweets({ q, count: 2, maxId }))
+        const res = await T.searchTweets(twimo, { q, count: 2, maxId })
 
         expect(res).toEqual(response)
     })
 
     test('getMutedIds', async () => {
-        const ids = ['23', '87', '23']
+        const ids = ['23', '87']
         n.get('/mutes/users/ids.json')
             .query({ tweet_mode, stringify_ids: true })
             .reply(200, { ids })
 
-        const res = await $.p(twimo, T.getMutedIds())
+        const res = await T.getMutedIds(twimo)
 
-        expect(res).toEqual(new Set(ids))
+        expect(res).toEqual(ids)
     })
 })
 
@@ -78,12 +75,7 @@ describe('post', () => {
             status: text,
         }).reply(200, { full_text: text })
 
-        const posted = await $.p(
-            twimo,
-            T.createTweet(text, {
-                hoge: undefined,
-            }),
-        )
+        const posted = await T.createTweet(twimo, text, { hoge: undefined })
 
         expect(posted.full_text).toBe(text)
     })
@@ -97,12 +89,12 @@ describe('post', () => {
                 body.tweet_mode === tweet_mode,
                 /test\d/.test(body.status),
                 !repId || repId === '3',
-            ].every(e => e)
+            ].every((e) => e)
         })
             .twice()
             .reply(() => [200, responses.shift()])
 
-        const posted = await $.p(twimo, T.postThread(['test1', 'test2']))
+        const posted = await T.postThread(twimo, ['test1', 'test2'])
 
         expect(posted).toEqual([{ id_str: '3' }, { id_str: '5' }])
     })
@@ -114,7 +106,7 @@ describe('post', () => {
             .thrice()
             .reply(() => [responseCodes.shift(), { id_str: '3' }])
 
-        const res = await $.p(twimo, T.retweet(['1', '3', '5']))
+        const res = await T.retweet(twimo, ['1', '3', '5'])
 
         expect(res).toEqual([{ id_str: '3' }, { id_str: '3' }])
     })
