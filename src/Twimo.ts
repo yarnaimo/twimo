@@ -1,14 +1,17 @@
 import { createHmac } from 'crypto'
 import OAuth from 'oauth-1.0a'
-import { TwitterAPIKeyOptions, TwitterTokenOptions } from './types'
+import { TwimoOptions } from './types'
 
 export const baseUrl = 'https://api.twitter.com/1.1'
 export const pathToUrl = (path: string) => `${baseUrl}/${path}.json`
 
+/**
+ * Twimoを初期化します。(consumer key/secret の設定と token の設定にカリー化されています)
+ */
 export const Twimo = ({
     consumerKey,
     consumerSecret,
-}: TwitterAPIKeyOptions) => ({ token, tokenSecret }: TwitterTokenOptions) => {
+}: TwimoOptions.Consumer) => ({ token, tokenSecret }: TwimoOptions.Token) => {
     const oauth = new OAuth({
         consumer: {
             key: consumerKey,

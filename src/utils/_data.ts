@@ -1,5 +1,5 @@
 import { JsonObject } from 'type-fest'
-import { JsonObjectU } from './types'
+import { JsonObjectU } from '../types'
 
 export const buildRequestData = (data: JsonObjectU) => {
     const filtered = Object.entries(data).reduce((a, [key, value]) => {
