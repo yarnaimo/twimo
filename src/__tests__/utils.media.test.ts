@@ -18,25 +18,23 @@ const sizes = {
 }
 
 test('getMediaList - image', () => {
-    const entities = [
-        {
-            type: 'photo',
-            media_url_https: mediaUrl + '1.jpg?xxx',
-            sizes,
-        },
-        {
-            type: 'photo',
-            media_url_https: mediaUrl + '2.jpg?xxx',
-            sizes,
-        },
-        {
-            type: 'video',
-            media_url_https: mediaUrl + '3.mp4?xxx',
-        },
-    ]
-
     const result = getMediaList({
-        extended_entities: { media: entities },
+        media: [
+            {
+                type: 'photo',
+                media_url_https: mediaUrl + '1.jpg?xxx',
+                sizes,
+            },
+            {
+                type: 'photo',
+                media_url_https: mediaUrl + '2.jpg?xxx',
+                sizes,
+            },
+            {
+                type: 'video',
+                media_url_https: mediaUrl + '3.mp4?xxx',
+            },
+        ],
     } as any)
 
     const expected = {
@@ -85,16 +83,14 @@ test('getMediaList - video', () => {
         'https://pbs.twimg.com/ext_tw_video_thumb/1/pu/img/a-Bc.jpg'
 
     const result = getMediaList({
-        extended_entities: {
-            media: [
-                {
-                    type: 'video',
-                    video_info,
-                    media_url_https: `${thumbUrl}?xxx`,
-                    sizes,
-                },
-            ],
-        },
+        media: [
+            {
+                type: 'video',
+                video_info,
+                media_url_https: `${thumbUrl}?xxx`,
+                sizes,
+            },
+        ],
     } as any)
 
     const expected = {
@@ -129,16 +125,14 @@ test('getMediaList - gif', () => {
     }
 
     const result = getMediaList({
-        extended_entities: {
-            media: [
-                {
-                    type: 'animated_gif',
-                    video_info,
-                    media_url_https: mediaUrl + '1.jpg?xxx',
-                    sizes,
-                },
-            ],
-        },
+        media: [
+            {
+                type: 'animated_gif',
+                video_info,
+                media_url_https: mediaUrl + '1.jpg?xxx',
+                sizes,
+            },
+        ],
     } as any)
 
     const expected = {

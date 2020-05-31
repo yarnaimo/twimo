@@ -1,6 +1,6 @@
 import { P, Switch } from 'lifts'
 import * as R from 'remeda'
-import { MediaEntity, Status } from 'twitter-d'
+import { ExtendedEntities, MediaEntity } from 'twitter-d'
 import { TwimoMediaEntity, TwimoMediaSet } from '../types'
 import { largestVariant, orig, thumb, video } from './_media'
 
@@ -54,11 +54,13 @@ export const getVideoEntity = ([entity]: MediaEntity[]):
 /**
  * ツイートに含まれるメディアの一覧を取得します。
  */
-export const getMediaList = ({ extended_entities }: Status): TwimoMediaSet => {
-    const mediaEntities = extended_entities?.media
+export const getMediaList = (
+    extended_entities: ExtendedEntities | null | undefined,
+): TwimoMediaSet => {
+    const mediaEntities = extended_entities?.media ?? []
 
-    const images = getImageEntities(mediaEntities ?? [])
-    const video = getVideoEntity(mediaEntities ?? [])
+    const images = getImageEntities(mediaEntities)
+    const video = getVideoEntity(mediaEntities)
 
     return { images, video }
 }
