@@ -6,7 +6,7 @@ import { buildRequestData } from './utils/_data'
 /**
  * GETメソッドのTwitter APIにリクエストを行います。
  */
-export const twget = <T extends object>(
+export const twget = async <T extends object>(
     twimo: Twimo,
     path: string,
     params: JsonObjectU = {},
@@ -15,18 +15,19 @@ export const twget = <T extends object>(
     const reqData = buildRequestData(params)
 
     const headers = twimo.buildHeader(url, 'GET', reqData)
-    return got
+    const response = await got
         .get(url, {
             headers,
             searchParams: reqData,
         })
         .json<T>()
+    return response
 }
 
 /**
  * POSTメソッドのTwitter APIにリクエストを行います。
  */
-export const twpost = <T extends object>(
+export const twpost = async <T extends object>(
     twimo: Twimo,
     path: string,
     data: JsonObjectU = {},
@@ -35,10 +36,11 @@ export const twpost = <T extends object>(
     const reqData = buildRequestData(data)
 
     const headers = twimo.buildHeader(url, 'POST', reqData)
-    return got
+    const response = await got
         .post(url, {
             headers,
             form: reqData,
         })
         .json<T>()
+    return response
 }
