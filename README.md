@@ -14,6 +14,7 @@ npm i -S @yarnaimo/twimo
 
 ```ts
 import { Twimo, twget, twpost } from '@yarnaimo/twimo'
+import { Status } from 'twitter-d'
 
 const twimo = Twimo({
     consumerKey: '***',
@@ -23,7 +24,7 @@ const twimo = Twimo({
     tokenSecret: '***',
 })
 
-const response = await twget<ResponseType>(twimo, path, params)
+const response = await twget<Status>(twimo, 'statuses/show', params)
 
 const response = await twpost<ResponseType>(twimo, path, params)
 ```
