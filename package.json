@@ -16,7 +16,9 @@
   },
   "dependencies": {
     "big-integer": "^1.6.48",
-    "got": "^11.1.4",
+    "crypto-js": "^4.0.0",
+    "ky": "^0.21.0",
+    "ky-universal": "^0.8.1",
     "lifts": "^0.1.2",
     "oauth-1.0a": "^2.2.6",
     "p-reduce": "^2.1.0",
@@ -25,6 +27,7 @@
   },
   "devDependencies": {
     "@types/config": "^0.0.36",
+    "@types/crypto-js": "^3.1.47",
     "@types/js-yaml": "^3.12.4",
     "@types/nock": "^11.1.0",
     "@yarnaimo/tss": "^0.2.0",

@@ -1,10 +1,10 @@
-import got from 'got'
+import ky from 'ky-universal'
 import { pathToUrl, Twimo } from './Twimo'
 import { JsonObjectU } from './types'
 import { buildRequestData } from './utils/_data'
 
 /**
- * GETメソッドのTwitter APIにリクエストを行います。
+ * GETメソッドのTwitter API エンドポイントにリクエストを行います。
  */
 export const twget = async <T extends object>(
     twimo: Twimo,
@@ -15,7 +15,7 @@ export const twget = async <T extends object>(
     const reqData = buildRequestData(params)
 
     const headers = twimo.buildHeader(url, 'GET', reqData)
-    const response = await got
+    const response = await ky
         .get(url, {
             headers,
             searchParams: reqData,
@@ -25,7 +25,7 @@ export const twget = async <T extends object>(
 }
 
 /**
- * POSTメソッドのTwitter APIにリクエストを行います。
+ * POSTメソッドのTwitter API エンドポイントにリクエストを行います。
  */
 export const twpost = async <T extends object>(
     twimo: Twimo,
@@ -34,12 +34,13 @@ export const twpost = async <T extends object>(
 ) => {
     const url = pathToUrl(path)
     const reqData = buildRequestData(data)
+    const searchParams = new URLSearchParams(reqData)
 
     const headers = twimo.buildHeader(url, 'POST', reqData)
-    const response = await got
+    const response = await ky
         .post(url, {
             headers,
-            form: reqData,
+            body: searchParams,
         })
         .json<T>()
     return response

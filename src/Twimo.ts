@@ -1,4 +1,5 @@
-import { createHmac } from 'crypto'
+import Base64 from 'crypto-js/enc-base64'
+import HmacSHA1 from 'crypto-js/hmac-sha1'
 import OAuth from 'oauth-1.0a'
 import { TwimoOptions } from './types'
 
@@ -20,7 +21,7 @@ export const Twimo = ({
         signature_method: 'HMAC-SHA1',
         realm: '',
         hash_function: (baseString, key) =>
-            createHmac('sha1', key).update(baseString).digest('base64'),
+            Base64.stringify(HmacSHA1(baseString, key)),
     })
 
     const tokenPair = { key: token, secret: tokenSecret }
