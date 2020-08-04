@@ -1,11 +1,5 @@
 import { Status } from 'twitter-d'
-import {
-    getTweetIdFromUrl,
-    getUrlOfTweet,
-    minusOne,
-    originalTweet,
-    plusOne,
-} from '../utils/tweet'
+import { minusOne, originalTweet, plusOne } from '..'
 
 test('plusOne', () => {
     expect(plusOne('17')).toBe('18')
@@ -21,21 +15,4 @@ test('originalTweet', () => {
     ).toEqual({
         id_str: '3',
     })
-})
-
-test('getUrlOfTweet', () => {
-    expect(
-        getUrlOfTweet({
-            retweeted_status: {
-                id_str: '1234',
-                user: { screen_name: 'yarnaimo' },
-            },
-        } as any),
-    ).toEqual('https://twitter.com/yarnaimo/status/1234')
-})
-
-test('getTweetIdFromUrl', () => {
-    expect(getTweetIdFromUrl('https://twitter.com/yarnaimo/status/1234')).toBe(
-        '1234',
-    )
 })

@@ -53,6 +53,10 @@ const response = await lookupTweets(twimo, ['123', '456'])
 -   plusOne
 -   minusOne
 -   originalTweet
--   getUrlOfTweet
--   getTweetIdFromUrl
 -   getMediaList
+-   TweetURL
+    -   parse
+    -   fromTweet
+-   UserPageURL
+    -   parse
+    -   fromUser
