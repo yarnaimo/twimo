@@ -1,0 +1,13 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`buildHeader get 1`] = `
+Object {
+  "Authorization": "OAuth oauth_consumer_key=\\"sHmm28ng3HD17RS16VbSec0U1\\", oauth_nonce=\\"1XKQ8G8FkIc2tmY0WD2RlREZn4NsJVne\\", oauth_signature=\\"yi4aL7WBRnkcXg8M2AI8yqp0Qac%3D\\", oauth_signature_method=\\"HMAC-SHA1\\", oauth_timestamp=\\"1598422807\\", oauth_token=\\"x384720394817x-SXVeoaHGyJ0YcqhNnY91dMe1nmoRjZ\\", oauth_version=\\"1.0\\"",
+}
+`;
+
+exports[`buildHeader post 1`] = `
+Object {
+  "Authorization": "OAuth oauth_consumer_key=\\"sHmm28ng3HD17RS16VbSec0U1\\", oauth_nonce=\\"1XKQ8G8FkIc2tmY0WD2RlREZn4NsJVne\\", oauth_signature=\\"WyS2A8f1HebrRcMcn7PAGT1tvn0%3D\\", oauth_signature_method=\\"HMAC-SHA1\\", oauth_timestamp=\\"1598422807\\", oauth_token=\\"x384720394817x-SXVeoaHGyJ0YcqhNnY91dMe1nmoRjZ\\", oauth_version=\\"1.0\\"",
+}
+`;

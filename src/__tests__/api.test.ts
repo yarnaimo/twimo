@@ -1,5 +1,5 @@
-import config from 'config'
 import nock from 'nock'
+import OAuth from 'oauth-1.0a'
 import { Status } from 'twitter-d'
 import {
     createTweet,
@@ -10,13 +10,48 @@ import {
     searchTweets,
 } from '../api'
 import { twget } from '../api-core'
-import { baseUrl, Twimo } from '../Twimo'
+import { baseUrl, pathToUrl, Twimo } from '../Twimo'
+import { twitterConfig } from './__config__/twitter'
 
-const { apiKeyOptions, tokenOptions } = config.get<any>('twitter')
+const { apiKeyOptions, tokenOptions } = twitterConfig
 const twimo = Twimo(apiKeyOptions)(tokenOptions)
 const n = nock(baseUrl)
 
 const tweet_mode = 'extended'
+
+describe('buildHeader', () => {
+    const mockDate = new Date(1598422807597)
+    let dateSpy: jest.SpyInstance<string, []>
+    let getNonceSpy: jest.SpyInstance<string, []>
+
+    beforeAll(() => {
+        dateSpy = jest
+            .spyOn(global, 'Date')
+            .mockImplementation(() => (mockDate as unknown) as string)
+        getNonceSpy = jest
+            .spyOn(OAuth.prototype, 'getNonce')
+            .mockImplementation(() => '1XKQ8G8FkIc2tmY0WD2RlREZn4NsJVne')
+    })
+
+    afterAll(() => {
+        dateSpy.mockRestore()
+        getNonceSpy.mockRestore()
+    })
+
+    test('get', () => {
+        const result = twimo.buildHeader(pathToUrl('statuses/show'), 'GET', {
+            id: '1234',
+        })
+        expect(result).toMatchSnapshot()
+    })
+
+    test('post', () => {
+        const result = twimo.buildHeader(pathToUrl('statuses/update'), 'POST', {
+            status: 'text',
+        })
+        expect(result).toMatchSnapshot()
+    })
+})
 
 describe('get', () => {
     test('get', async () => {
